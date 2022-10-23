@@ -12,16 +12,19 @@
     "esModuleInterop": true,
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
-    "types": [
-      "pinia-plugin-persist",
-    ],
+    "types": ["pinia-plugin-persist"],
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"]
     },
     "baseUrl": "."
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    // elmessage
+    "**/*.d.ts"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
