@@ -5,18 +5,23 @@
     </div>
     <ElDropdown @command="handleCommand">
       <div class="info-block-container">
-      <div class="user-name">
-        {{ userStore.userName }}
-      </div>
+        <div class="user-name">
+          {{ userStore.userName }}
+        </div>
         <div>
           <IEpCaretTop class="caret-top" />
         </div>
       </div>
       <template #dropdown>
         <ElDropdownMenu>
-          <ElDropdownItem command="a">个人空间</ElDropdownItem>
-          <ElDropdownItem command="b">系统设置</ElDropdownItem>
-          <ElDropdownItem command="c">退出登录</ElDropdownItem>
+          <ElDropdownItem command="a">
+            <IEpUserFilled />个人空间</ElDropdownItem
+          >
+          <ElDropdownItem command="b"> <IEpSetting />系统设置</ElDropdownItem>
+          <ElDropdownItem command="c">
+            <IEpSwitchButton />
+            退出登录</ElDropdownItem
+          >
         </ElDropdownMenu>
       </template>
     </ElDropdown>
@@ -42,7 +47,7 @@
     border: 1px solid hsla(0, 0%, 100%, 0.4);
     border-radius: 20px;
     color: #e8e9fd;
-    
+
     .user-name {
       white-space: nowrap;
       width: 100px;
@@ -71,7 +76,6 @@
 
 :global(.el-dropdown__popper) {
   --el-dropdown-menuItem-hover-color: rgb(110, 196, 44);
-  
 }
 </style>
 

@@ -29,7 +29,7 @@ export default defineConfig({
       resolvers: [
         ElementPlusResolver(),
         IconsResolver({
-          enabledCollections: ['ep'],
+          enabledCollections: ['ep', 'ic', 'fluent'],
         })
       ],
       dirs:["src/components", "src/views"],

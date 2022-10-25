@@ -28,6 +28,5 @@ export default defineComponent({
     background-color: #6366F1;
     height: $headerHeight;
     width: 100%;
-    border-bottom: 1px solid var(--el-border-color);
 }
 </style>
