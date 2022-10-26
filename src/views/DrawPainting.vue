@@ -42,7 +42,7 @@
           <IEpRefreshRight />
           下一步</ElButton
         >
-        <ElButton @click="downloadPicture('canvas')">
+        <ElButton @click="toggleDownloadPainting">
           <IEpPrinter />
           存储本地
         </ElButton>
@@ -59,11 +59,10 @@
   </div>
 
   <ElDialog v-model="dialogFormVisible" title="作品">
+    <ElInput v-model="paintingName" placeholder="Please input" clearable />
     <template #footer>
       <ElButton @click="dialogFormVisible = false">Cancel</ElButton>
-      <ElButton type="primary" @click="dialogFormVisible = false"
-        >Confirm</ElButton
-      >
+      <ElButton type="primary" @click="downloadPicture">Confirm</ElButton>
     </template>
   </ElDialog>
 </template>
@@ -83,7 +82,7 @@ export default defineComponent({
     const cBackgroundColor = ref<string>("#111827");
     const brush = ref<fabric.BaseBrush>();
     const toolColor = ref<string>("#eeeeee");
-    const toolWidth = ref(5);
+    const toolWidth = ref<number>(5);
     // const toolWidth = ref<Arrayable<number>>(4);
     const currentMode = ref<
       "eraser" | "pen" | "move" | "rect" | "line" | "circle"
@@ -92,6 +91,7 @@ export default defineComponent({
     const circle = ref<fabric.Circle>();
     const mouseFrom = reactive<{ x: number; y: number }>({ x: 0, y: 0 });
     const mouseTo = reactive<{ x: number; y: number }>({ x: 0, y: 0 });
+    const paintingName = ref<string>("");
     const dialogFormVisible = ref(false);
     //canvas init
     const canvasWidth =
@@ -300,13 +300,15 @@ export default defineComponent({
       if (childrens!.length > 0) canvas.value?.remove(...childrens);
       stateArray.length = 0;
     };
-    
+
+    // const ElInputVNode = h("ElInput");
     //画布导出为图片
-    const downloadPicture = (canvasId: string) => {
-      dialogFormVisible.value = true;
+    const toggleDownloadPainting = () => dialogFormVisible.value = true;
+    const downloadPicture = () => {
+      dialogFormVisible.value = false;
       domCanvas.value?.toBlob((blob) => {
         //@ts-ignore
-        saveAs(blob, "zzx.png");
+        saveAs(blob, paintingName.value + ".png");
       });
     };
 
@@ -383,6 +385,8 @@ export default defineComponent({
       changeToolColor,
       previousStep,
       nextStep,
+      paintingName,
+      toggleDownloadPainting,
     };
   },
 });
