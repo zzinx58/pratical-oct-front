@@ -72,6 +72,7 @@
 import { fabric } from "fabric";
 import { saveAs } from "file-saver";
 import canvasStyles from "@/styles/canvas.module.scss";
+// import { Arrayable } from "element-plus/es/utils";
 export default defineComponent({
   name: "DrawPainting",
   setup(props) {
@@ -82,7 +83,8 @@ export default defineComponent({
     const cBackgroundColor = ref<string>("#111827");
     const brush = ref<fabric.BaseBrush>();
     const toolColor = ref<string>("#eeeeee");
-    const toolWidth = ref<number>(4);
+    const toolWidth = ref(5);
+    // const toolWidth = ref<Arrayable<number>>(4);
     const currentMode = ref<
       "eraser" | "pen" | "move" | "rect" | "line" | "circle"
     >("pen");
@@ -164,8 +166,9 @@ export default defineComponent({
       });
     };
 
+    //保存每步操作的内容
     const saveSteps = () => {
-      console.log("save_index: [start:1]",stateIndex.value);
+      console.log("save_index: [start:1]", stateIndex.value);
       stateIndex.value = stateIndex.value + 1;
       stateArray[stateIndex.value] = JSON.stringify(canvas.value);
     };
@@ -173,25 +176,25 @@ export default defineComponent({
     //historyRecover
     const toggleHistoryRecover = (flag: number) => {
       let stateIdxTemp = stateIndex.value + flag;
-      if(stateIdxTemp < 1) {
+      if (stateIdxTemp < 1) {
         console.log("out, the first step");
-      };
-      if(stateIdxTemp >= stateArray.length) {
+      }
+      if (stateIdxTemp >= stateArray.length) {
         console.log("out,the last one");
-      };
-      if(stateArray[stateIdxTemp]) {
+      }
+      if (stateArray[stateIdxTemp]) {
         canvas.value?.loadFromJSON(stateArray[stateIdxTemp], () => {
           console.log("preStepRecover");
         });
-        if(canvas.value!.getObjects().length > 0) {
-          canvas.value?.getObjects().forEach(item => {
-            item.set('selectable', false);
-          })
+        if (canvas.value!.getObjects().length > 0) {
+          canvas.value?.getObjects().forEach((item) => {
+            item.set("selectable", false);
+          });
         }
         stateIndex.value = stateIdxTemp;
       }
       console.log("cur_step:", stateIndex.value - 1);
-    }
+    };
     //上一步
     const previousStep = () => {
       toggleHistoryRecover(-1);
@@ -211,6 +214,7 @@ export default defineComponent({
         currentMode.value = "move";
       }
     };
+
     //橡皮擦
     // @ts-ignore
     const toggleErasing = () => {
@@ -294,8 +298,9 @@ export default defineComponent({
       // canvas.value?.clear();
       const childrens = canvas.value!.getObjects();
       if (childrens!.length > 0) canvas.value?.remove(...childrens);
+      stateArray.length = 0;
     };
-    //撤销还原
+    
     //画布导出为图片
     const downloadPicture = (canvasId: string) => {
       dialogFormVisible.value = true;
@@ -309,18 +314,56 @@ export default defineComponent({
       ElMessageBox({
         title: "ChangeToolColor",
         message: () =>
-          h(ElColorPicker, {
-            modelValue: toolColor.value,
-            onChange: (color) => {
-              toolColor.value = color!;
-              canvas.value!.freeDrawingBrush.color = toolColor.value;
+          h(
+            "div",
+            {
+              class: "pl-20px pt-20px",
             },
-          }),
+            [
+              h(
+                "div",
+                {
+                  class: "flex justify-between items-center",
+                  style: { width: "40%" },
+                },
+                [
+                  "setToolColor:",
+                  h(ElColorPicker, {
+                    modelValue: toolColor.value,
+                    onChange: (color) => {
+                      toolColor.value = color!;
+                      canvas.value!.freeDrawingBrush.color = toolColor.value;
+                    },
+                  }),
+                ]
+              ),
+            ]
+          ),
       });
       console.log(toolColor.value);
     };
 
-    const changeToolSize = () => {};
+    const changeToolSize = () => {
+      ElMessageBox({
+        title: "ChangeToolSize",
+        message: () =>
+          h("div", { class: "pl-20px pt-20px" }, [
+            h("div", {}, [
+              "setToolSize",
+              h(ElSlider, {
+                modelValue: toolWidth.value,
+                step: 5,
+                max: 50,
+                showStops: true,
+                onInput: (val) => {
+                  toolWidth.value = val as number;
+                  canvas.value!.freeDrawingBrush.width = toolWidth.value;
+                },
+              }),
+            ]),
+          ]),
+      });
+    };
 
     onMounted(() => {
       init();

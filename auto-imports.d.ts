@@ -4,6 +4,7 @@ declare global {
   const EffectScope: typeof import('vue')['EffectScope']
   const ElColorPicker: typeof import('element-plus/es')['ElColorPicker']
   const ElMessageBox: typeof import('element-plus/es')['ElMessageBox']
+  const ElSlider: typeof import('element-plus/es')['ElSlider']
   const computed: typeof import('vue')['computed']
   const createApp: typeof import('vue')['createApp']
   const customRef: typeof import('vue')['customRef']
