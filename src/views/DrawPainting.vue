@@ -140,7 +140,9 @@ export default defineComponent({
         }
       });
       canvas.value?.on("mouse:up", (option) => {
-        saveSteps();
+        if (currentMode.value !== "move") {
+          saveSteps();
+        }
         mouseTo.x = option.e.clientX - canvasOffsetObject!.left;
         mouseTo.y = option.e.clientY - canvasOffsetObject!.top;
         switch (currentMode.value) {
