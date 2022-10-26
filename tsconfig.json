@@ -12,11 +12,12 @@
     "esModuleInterop": true,
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
-    "types": ["pinia-plugin-persist"],
+    "types": ["pinia-plugin-persist", "node"],
     "paths": {
       "@/*": ["src/*"]
     },
-    "baseUrl": "."
+    "baseUrl": ".",
+    "allowJs": true
   },
   "include": [
     "src/**/*.ts",

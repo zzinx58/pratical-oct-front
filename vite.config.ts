@@ -24,12 +24,13 @@ export default defineConfig({
           prefix: "Icon",
         })
       ],
+      imports: ['vue']
     }),
     Components({
       resolvers: [
         ElementPlusResolver(),
         IconsResolver({
-          enabledCollections: ['ep', 'ic', 'fluent'],
+          enabledCollections: ['ep', 'ic', 'fluent', 'mdi'],
         })
       ],
       dirs:["src/components", "src/views"],
@@ -47,7 +48,8 @@ export default defineConfig({
     preprocessorOptions: {
       scss: {
         additionalData: `
-        @use "./src/styles/zzinx58.scss" as *;
+        @use "./src/styles/zzinx58.scss"
+        as *;
         `
       }
     }
