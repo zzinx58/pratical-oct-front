@@ -77,11 +77,15 @@ export default defineComponent({
   setup(props) {
     const domCanvas = ref<HTMLCanvasElement | null>(null);
     const canvas = ref<fabric.Canvas>();
+    const stateArray = <Array<string>>[];
+    const stateIndex = ref<number>(0);
     const cBackgroundColor = ref<string>("#111827");
     const brush = ref<fabric.BaseBrush>();
     const toolColor = ref<string>("#eeeeee");
     const toolWidth = ref<number>(4);
-    const currentMode = ref<"eraser" | "pen" | "move" | "rect" | "line" | "circle">("pen");
+    const currentMode = ref<
+      "eraser" | "pen" | "move" | "rect" | "line" | "circle"
+    >("pen");
     const rect = ref<fabric.Rect>();
     const circle = ref<fabric.Circle>();
     const mouseFrom = reactive<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -116,6 +120,8 @@ export default defineComponent({
       canvas.value.freeDrawingBrush.width = toolWidth.value;
       //默认启用画笔模式
       canvas.value.isDrawingMode = true;
+      //记录初始状态
+      saveSteps();
     };
 
     //监听鼠标按下事件
@@ -127,15 +133,18 @@ export default defineComponent({
         mouseFrom.y = option.e.clientY - canvasOffsetObject!.top;
         //some kind of important
         //logic and || operation
-        if (currentMode.value !== "pen" ? currentMode.value !== "eraser" : false) {
+        if (
+          currentMode.value !== "pen" ? currentMode.value !== "eraser" : false
+        ) {
           canvas.value!.isDrawingMode = false;
         }
       });
       canvas.value?.on("mouse:up", (option) => {
+        saveSteps();
         mouseTo.x = option.e.clientX - canvasOffsetObject!.left;
         mouseTo.y = option.e.clientY - canvasOffsetObject!.top;
         switch (currentMode.value) {
-          case "eraser": 
+          case "eraser":
             console.log(1);
             break;
           case "line":
@@ -151,6 +160,43 @@ export default defineComponent({
             break;
         }
       });
+    };
+
+    const saveSteps = () => {
+      console.log("save_index: [start:1]",stateIndex.value);
+      stateIndex.value = stateIndex.value + 1;
+      stateArray[stateIndex.value] = JSON.stringify(canvas.value);
+    };
+
+    //historyRecover
+    const toggleHistoryRecover = (flag: number) => {
+      let stateIdxTemp = stateIndex.value + flag;
+      if(stateIdxTemp < 1) {
+        console.log("out, the first step");
+      };
+      if(stateIdxTemp >= stateArray.length) {
+        console.log("out,the last one");
+      };
+      if(stateArray[stateIdxTemp]) {
+        canvas.value?.loadFromJSON(stateArray[stateIdxTemp], () => {
+          console.log("preStepRecover");
+        });
+        if(canvas.value!.getObjects().length > 0) {
+          canvas.value?.getObjects().forEach(item => {
+            item.set('selectable', false);
+          })
+        }
+        stateIndex.value = stateIdxTemp;
+      }
+      console.log("cur_step:", stateIndex.value - 1);
+    }
+    //上一步
+    const previousStep = () => {
+      toggleHistoryRecover(-1);
+    };
+    //下一步
+    const nextStep = () => {
+      toggleHistoryRecover(1);
     };
 
     //触发画笔
@@ -170,7 +216,7 @@ export default defineComponent({
       //暂时使用颜色覆盖的方式解决问题
       canvas.value!.freeDrawingBrush.width = toolWidth.value;
       canvas.value!.freeDrawingBrush.color = cBackgroundColor.value;
-    }
+    };
 
     //直线
     const toggleDrawLine = () => {
@@ -191,6 +237,7 @@ export default defineComponent({
       );
       canvas.value?.add(line);
     };
+
     //矩形
     const toggleDrawRect = () => {
       if (currentMode.value !== "rect") {
@@ -212,6 +259,7 @@ export default defineComponent({
       });
       canvas.value?.add(rect.value);
     };
+
     //圆形
     const toggleDrawCircle = () => {
       if (currentMode.value !== "circle") {
@@ -239,20 +287,11 @@ export default defineComponent({
       canvas.value?.add(circle.value);
     };
 
-    //上一步
-    const previousStep = () => {
-
-    }
-    //下一步
-    const nextStep = () => {
-
-    }
-
     //画布重新绘制
     const clearCanvas = () => {
       // canvas.value?.clear();
       const childrens = canvas.value!.getObjects();
-      if(childrens!.length > 0) canvas.value?.remove(...childrens);
+      if (childrens!.length > 0) canvas.value?.remove(...childrens);
     };
     //撤销还原
     //画布导出为图片
