@@ -37,8 +37,8 @@
           <IEpDelete />
           重置画布
         </ElButton>
-        <ElButton><IEpRefreshLeft />上一步</ElButton>
-        <ElButton>
+        <ElButton @click="previousStep"><IEpRefreshLeft />上一步</ElButton>
+        <ElButton @click="nextStep">
           <IEpRefreshRight />
           下一步</ElButton
         >
@@ -172,10 +172,6 @@ export default defineComponent({
       canvas.value!.freeDrawingBrush.color = cBackgroundColor.value;
     }
 
-    const drawErasing = () => {
-
-    }
-
     //直线
     const toggleDrawLine = () => {
       if (currentMode.value !== "line") {
@@ -243,10 +239,20 @@ export default defineComponent({
       canvas.value?.add(circle.value);
     };
 
+    //上一步
+    const previousStep = () => {
+
+    }
+    //下一步
+    const nextStep = () => {
+
+    }
 
     //画布重新绘制
     const clearCanvas = () => {
-      canvas.value?.clear();
+      // canvas.value?.clear();
+      const childrens = canvas.value!.getObjects();
+      if(childrens!.length > 0) canvas.value?.remove(...childrens);
     };
     //撤销还原
     //画布导出为图片
@@ -291,6 +297,8 @@ export default defineComponent({
       clearCanvas,
       changeToolSize,
       changeToolColor,
+      previousStep,
+      nextStep,
     };
   },
 });
