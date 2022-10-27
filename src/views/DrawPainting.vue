@@ -58,8 +58,11 @@
     </div>
   </div>
 
-  <ElDialog v-model="dialogFormVisible" title="作品">
+  <ElDialog v-model="dialogFormVisible" title="作品保存本地">
+  <div class="flex whitespace-nowrap">
+  <div class="items-center flex">文件名称：</div>
     <ElInput v-model="paintingName" placeholder="Please input" clearable />
+  </div>
     <template #footer>
       <ElButton @click="dialogFormVisible = false">Cancel</ElButton>
       <ElButton type="primary" @click="downloadPicture">Confirm</ElButton>
@@ -392,6 +395,7 @@ export default defineComponent({
 });
 </script>
 
+
 <style scoped lang="scss">
 .icon-circle {
   width: 15px;
@@ -439,7 +443,5 @@ export default defineComponent({
       }
     }
   }
-}
-#canvas {
 }
 </style>
