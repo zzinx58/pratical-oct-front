@@ -13,9 +13,6 @@ export default defineComponent({
     localStorage.setItem("vueuse-color-scheme", "dark");
     // const isDark = useDark();
     // const toggleDark = useToggle(isDark);
-    const env1 = import.meta.env.VITE_NAME;
-    console.log(env1);
-    
     return {
       userStore,
     };

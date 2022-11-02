@@ -1,5 +1,8 @@
 interface ImportMetaEnv {
-    readonly VITE_NAME: string
+    readonly VITE_COS_SECRETID: string
+    readonly VITE_COS_SECRETKEY: string
+    readonly VITE_COS_BUCKET: string
+    readonly VITE_COS_REGION: string
     // more env variables...
   }
   
