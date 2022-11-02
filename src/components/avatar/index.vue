@@ -1,7 +1,8 @@
 <template>
   <div class="avatar-container">
     <div class="avatar">
-      <ElAvatar :src="userStore.userAvatarSrc" shape="circle" :size="44" />
+      <!-- <ElAvatar :src="userStore.userAvatarSrc" shape="circle" :size="44" /> -->
+      <ElAvatar :src="userAvatarSrc" shape="circle" :size="44" />
     </div>
     <ElDropdown @command="handleCommand">
       <div class="info-block-container">
@@ -83,9 +84,18 @@
 import { defineComponent } from "vue";
 import { useUserStore } from "@/store/user";
 import { ElDropdownMenu } from "element-plus";
+import { COS_Service } from "@/hooks/cos";
 export default defineComponent({
   name: "Avatar",
   setup() {
+    const COSService = new COS_Service();
+    const userAvatarSrc = ref();
+    async function getSrc() {
+      userAvatarSrc.value = await COSService.getObjectUrl({
+        Key: "1095568627@qq.com/userConfig/userAvatar.JPG",
+      });
+    };
+    getSrc();
     const userStore = useUserStore();
     const handleCommand = (command: string | number | object) => {
       switch (command) {
@@ -100,8 +110,8 @@ export default defineComponent({
     return {
       userStore,
       handleCommand,
+      userAvatarSrc,
     };
   },
-  components: { ElDropdownMenu },
 });
 </script>

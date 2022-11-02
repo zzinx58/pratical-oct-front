@@ -7,7 +7,8 @@ import {ref}from "vue"
 import {UploadProps, UploadUserFile} from "element-plus"
 //2
 import type {UploadInstance} from "element-plus"
-import COSInstance from "./hooks/cos";
+import {COS_Service} from "./hooks/cos";
+const COSService = new COS_Service();
 const fileList = ref<UploadUserFile[]>([])
 const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
   console.log(file, uploadFiles);
@@ -36,7 +37,7 @@ const Bucket = "school-work-1308651335"
 const Region = "ap-shanghai"
 const uploadRef = ref<UploadInstance>()
 const submitUpload = (file: any) => {
-  COSInstance.uploadFile({
+  COSService.uploadFile({
     Bucket: Bucket,
     Region: Region,
     Key: "front.jpg",

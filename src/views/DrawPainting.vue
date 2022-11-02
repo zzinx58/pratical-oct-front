@@ -46,7 +46,7 @@
           <IEpPrinter />
           存储本地
         </ElButton>
-        <ElButton>
+        <ElButton @click="toggleSaveAsPainting">
           <IIcRoundSave />
           存为作品
         </ElButton>
@@ -58,14 +58,33 @@
     </div>
   </div>
 
-  <ElDialog v-model="dialogFormVisible" title="作品保存本地">
-  <div class="flex whitespace-nowrap">
-  <div class="items-center flex">文件名称：</div>
-    <ElInput v-model="paintingName" placeholder="Please input" clearable />
-  </div>
+  <ElDialog v-model="dialogFormVisible_saveLoc" title="作品保存本地">
+    <div class="flex whitespace-nowrap">
+      <div class="items-center flex">文件名称：</div>
+      <ElInput v-model="paintingName" placeholder="Please input" clearable />
+    </div>
     <template #footer>
-      <ElButton @click="dialogFormVisible = false">Cancel</ElButton>
+      <ElButton @click="dialogFormVisible_saveLoc = false">Cancel</ElButton>
       <ElButton type="primary" @click="downloadPicture">Confirm</ElButton>
+    </template>
+  </ElDialog>
+  <ElDialog v-model="dialogFormVisible_saveClo" title="保存为作品">
+    <div class="flex whitespace-nowrap flex-col">
+      <div class="items-center flex">文件名称：</div>
+      <ElInput v-model="paintingName" placeholder="Please input" clearable />
+      <div>选择所属专辑:</div>
+      <ElSelect v-model="selectedValue" placeholder="select ParentAlbum">
+        <ElOption
+          v-for="item in selectOptions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        />
+      </ElSelect>
+    </div>
+    <template #footer>
+      <ElButton @click="dialogFormVisible_saveClo = false">Cancel</ElButton>
+      <ElButton type="primary" @click="SaveAsPainting">Confirm</ElButton>
     </template>
   </ElDialog>
 </template>
@@ -74,10 +93,16 @@
 import { fabric } from "fabric";
 import { saveAs } from "file-saver";
 import canvasStyles from "@/styles/canvas.module.scss";
+import { COS_Service } from "@/hooks/cos";
+import { testStr } from "./Gallery.vue";
 // import { Arrayable } from "element-plus/es/utils";
 export default defineComponent({
   name: "DrawPainting",
   setup(props) {
+    const dialogFormVisible_saveClo = ref(false);
+    const selectedValue = ref("");
+    const selectOptions = [{ value: "defaultAlbum", label: "defaultAlbum" }];
+    const COSService = new COS_Service();
     const domCanvas = ref<HTMLCanvasElement | null>(null);
     const canvas = ref<fabric.Canvas>();
     const stateArray = <Array<string>>[];
@@ -95,7 +120,7 @@ export default defineComponent({
     const mouseFrom = reactive<{ x: number; y: number }>({ x: 0, y: 0 });
     const mouseTo = reactive<{ x: number; y: number }>({ x: 0, y: 0 });
     const paintingName = ref<string>("");
-    const dialogFormVisible = ref(false);
+    const dialogFormVisible_saveLoc = ref(false);
     //canvas init
     const canvasWidth =
       window.innerWidth - (canvasStyles.canvasToolsBarWidth as any);
@@ -306,14 +331,28 @@ export default defineComponent({
 
     // const ElInputVNode = h("ElInput");
     //画布导出为图片
-    const toggleDownloadPainting = () => dialogFormVisible.value = true;
+    const toggleDownloadPainting = () => (dialogFormVisible_saveLoc.value = true);
     const downloadPicture = () => {
-      dialogFormVisible.value = false;
+      dialogFormVisible_saveLoc.value = false;
       domCanvas.value?.toBlob((blob) => {
         //@ts-ignore
         saveAs(blob, paintingName.value + ".png");
       });
     };
+
+    const toggleSaveAsPainting = () => (dialogFormVisible_saveClo.value = true)
+    //将画作保存为作品
+    const SaveAsPainting = () => {
+      domCanvas.value?.toBlob(async (blob: any) => {
+        const result = await COSService.uploadFile({
+          Key: testStr + "/" + paintingName.value + ".png",
+          Body: blob,
+        });
+        console.log(result);
+      });
+      dialogFormVisible_saveClo.value = false;
+    };
+
 
     const changeToolColor = () => {
       ElMessageBox({
@@ -382,7 +421,9 @@ export default defineComponent({
       toggleDrawRect,
       toggleDrawCircle,
       downloadPicture,
-      dialogFormVisible,
+      dialogFormVisible_saveClo,
+      dialogFormVisible_saveLoc,
+      SaveAsPainting,
       clearCanvas,
       changeToolSize,
       changeToolColor,
@@ -390,11 +431,13 @@ export default defineComponent({
       nextStep,
       paintingName,
       toggleDownloadPainting,
+      toggleSaveAsPainting,
+      selectOptions,
+      selectedValue,
     };
   },
 });
 </script>
-
 
 <style scoped lang="scss">
 .icon-circle {
