@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>无标题文档</title>
+</head>
+	<style type="text/css">
+		#mycanvas {
+			border:1pt solid red;
+			border-radius:10px;
+			margin-bottom: 10px;
+			box-shadow: 10px 10px 5px 0px #888888;
+		}
+		input{
+			background: rgb(50, 238, 144);
+			color:black ;
+			border:none;
+			padding: 6px 15px;
+			font-size: 16px;     
+			cursor: pointer;     
+			border-radius:15px;
+			transition-duration:0.2s;
+		}
+		input:hover{
+			border:1px solid red;
+			box-shadow: 0 0px 16px 5px rgba(0, 0, 0, 0.3);
+		}
+	</style>
+<body>
+<canvas id="mycanvas" width="1000" height="500"></canvas><br>
+<input type="color" id="colorselector" onChange="colorchanged()"/>
+<input type="button" id="backout" value="撤销" onClick="popout()"/>
+<input type="button" id="eraser" value="橡皮" onClick="eraser()"/>
+<input type="button" id="drawRect" value="矩形" onClick="drawRect()"/>
+<input type="button" id="drawline" value="画线" onClick="resetdrawline()"/>
+<input type="range"  value="1" id="lineRuler" min="1" max="20"  onChange="rulerChanged()">
+<input type="button" id="saveimage" value="保存图像" onClick="saveImage()"/>
+<input type="button" id="downimage" value="下载图像" onClick="downImage()"/>
+<script type="text/javascript">
+var can=document.getElementById("mycanvas");
+var cxt=can.getContext("2d");
+var colorselector=document.getElementById("colorselector");
+var lineRuler=document.getElementById("lineRuler");
+var color="#000000";
+var ruler=1;       //画笔粗细
+var imageDatas=new Array();
+var drawline=function(e){
+	var imagedata=cxt.getImageData(0,0,1000,500);      //		取出画板的图像数据
+	imageDatas.push(imagedata);    //放到栈里面		
+	cxt.beginPath();
+	cxt.strokeStyle=color;     //设置画笔颜色
+	cxt.lineWidth=ruler;       //设置画笔的粗细
+	cxt.moveTo(e.pageX,e.pageY);
+	document.onmousemove=function(e){
+		//非常短暂的过程
+		console.log('鼠标移动'+e.pageX+''+e.pageY);
+		cxt.lineTo(e.pageX,e.pageY);
+		cxt.stroke();		
+		}
+    document.onmouseup=function(e){
+		document.onmousemove=null;
+		cxt.closePath();		
+		//popout();
+		}
+	}
+can.onmousedown=drawline;
+function colorchanged(){
+	color=colorselector.value;
+	console.log(colorselector.value);
+	}
+function popout(){
+	cxt.putImageData(imageDatas.pop(),0,0);//把照片取出一张放到画板上
+	console.log(imageDatas);
+	}
+function rulerChanged(){
+	ruler=lineRuler.value;
+	}
+function eraser(){
+	color="#FFFFFF";   //把画笔设置为白色
+	}
+function saveImage(){   //保存图像
+	var img=can.toDataURL("image/png");
+	var w=window.open('about:blank','image from canvas');
+	w.document.write("<img src='"+img+"'/>");
+	}
+function downImage(){    //下载图像
+	var img=can.toDataURL("image/png").replace("image/png","image/octet-stream");
+	window.location.href=img;
+	}
+function resetdrawline(){
+	can.onmousedown=drawline;
+	}
+function drawRect(){
+	can.onmousedown=function(e){
+		var imagedata=cxt.getImageData(0,0,1000,500);      //		取出画板的图像数据
+		imageDatas.push(imagedata);    //放到栈里面		
+		cxt.beginPath();
+		cxt.strokeStyle=color;     //设置画笔颜色
+		cxt.lineWidth=ruler;       //设置画笔的粗细
+		var x=e.pageX;
+		var y=e.pageY;
+		cxt.moveTo(e.pageX,e.pageY);
+		document.onmousemove=function(e){
+			cxt.putImageData(imageDatas[imageDatas.length-1],0,0);
+			cxt.strokeRect(x,y,e.pageX-x,e.pageY-y);	
+			}
+    	document.onmouseup=function(e){
+			document.onmousemove=null;
+			cxt.closePath();	
+			}
+		}
+	}
+</script>
+
+</body>
+</html>
